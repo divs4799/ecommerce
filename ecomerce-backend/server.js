@@ -29,8 +29,15 @@ app.post("/saveCart",(req,res)=>{
 
 app.get("/getCart",(req,res)=>{
     res.json({
-        data:cart
+        cart:cart,
+        favourites:favourites
       })
+})
+
+app.post("/saveFav",(req,res)=>{
+    favourites = req.body.favourites;
+    console.log("favs",favourites);
+    res.json({message:"Favourites saved"})
 })
 app.listen(5000,()=>{
     console.log("Server started on port 5000")

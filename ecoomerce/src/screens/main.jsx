@@ -54,17 +54,31 @@ const Main = () => {
   
   const addToCart = (product) => {
       setCart([...cart, product]);
-      console.log(cart);
+      // console.log(cart);
   };
+
+  // const toggleFavorite = (product) => {
+      
+  //   if (favorites.some(fav => fav.id === product.id)) {
+  //     setFavorites(favorites.filter((p) => p.id !== product.id));
+  //   } else {
+  //     setFavorites([...favorites, product]);
+  //   }
+  //   saveFavourite();
+  // };
 
   const toggleFavorite = (product) => {
-    if (favorites.some(fav => fav.id === product.id)) {
-      setFavorites(favorites.filter((p) => p.id !== product.id));
+    const updatedFavorites = [...favorites];
+    const index = updatedFavorites.findIndex((fav) => fav.id === product.id);
+    if (index !== -1) {
+      updatedFavorites.splice(index, 1);
     } else {
-      setFavorites([...favorites, product]);
+      updatedFavorites.push(product);
     }
+    setFavorites(updatedFavorites);
+    saveFavourite(updatedFavorites);
+    // localStorage.setItem('favorites', JSON.stringify(updatedFavorites)); // Update localStorage
   };
-
   const purchaseProduct = (product) => {
     const newPurchase = {
       productName: product.title,
@@ -79,25 +93,33 @@ const Main = () => {
   };
 
   const switchToCart=()=>{
-    navigate("/cart",{state:{cart:cart}});
+    navigate("/cart",{state:{cart:cart,favorites:favorites}});
   }
 
 useEffect(()=>{
     axios.get("http://localhost:5000/getProducts").then(result=>{
-        console.log(result.data.data);
+        // console.log(result.data.data);
         setProducts(result.data.data.products)
     })
     axios.get("http://localhost:5000/getCart").then(result=>{
-        console.log(result.data.data);
-        setCart(result.data.data)
+        console.log("favs : ",result.data.favourites);
+        setCart(result.data.cart)
+        setFavorites(result.data.favourites)
     })
 },[])
+
+function saveFavourite(favs){
+  axios.post("http://localhost:5000/saveFav",{favourites:favs}).then((result)=>{
+      console.log("message",result.data.message);
+    })
+
+}
 
 
   return (
     
     <div className="app">
-        {console.log("Prods : ",products)}
+        {/* {console.log("Prods : ",products)} */}
       <header className="header">
         <h1>My Store</h1>
         <div className="left-div">

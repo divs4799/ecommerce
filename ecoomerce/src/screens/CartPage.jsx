@@ -6,7 +6,10 @@ import axios from "axios";
 const CartPage = (props) => {
   const { state } = useLocation();
   const navigate = useNavigate();
+  console.log("state: ",state);
   const [cart, setCart] = useState(state.cart); // Initialize quantity for each item
+  const [favorites,setFavorites] = useState(state.favorites)
+  // const toggleFavorite = state.toggleFavorite;
   console.log(cart);
   const updateQuantity = (id, quantity) => {
     const updatedCart = cart.map(item => {
@@ -31,6 +34,27 @@ const CartPage = (props) => {
     console.log("checkout")
     alert(`Your Order has been placed with the total amount of ${calculateTotalPrice()}`);
     navigate("/");
+  }
+  const SearchFavs= (id)=>{
+    console.log("favs : ",favorites);
+    return favorites.some((fav) => fav.id === id);
+  }
+  const toggleFavorite = (product) => {
+    const updatedFavorites = [...favorites];
+    const index = updatedFavorites.findIndex((fav) => fav.id === product.id);
+    if (index !== -1) {
+      updatedFavorites.splice(index, 1);
+    } else {
+      updatedFavorites.push(product);
+    }
+    setFavorites(updatedFavorites);
+    saveFavourite(updatedFavorites);
+  };
+  function saveFavourite(favs){
+    axios.post("http://localhost:5000/saveFav",{favourites:favs}).then((result)=>{
+        console.log("message",result.data.message);
+      })
+  
   }
 
   return (
@@ -58,6 +82,7 @@ const CartPage = (props) => {
                   </select>
                 </span>
                 <span className="paragraph">Price: Rs {item.price}</span>
+                <span> <button onClick={()=>toggleFavorite(item)}>{SearchFavs(item.id)?"Remove from Favourite":"Add to Favorite"}</button> </span>
               </div>
             </li>
           ))}
